@@ -6,7 +6,7 @@ export default async function Page() {
   const session = await auth();
 
   if (session?.user) {
-    void api.appartment.listAll.prefetch();
+    void api.apartment.listAll.prefetch();
   }
 
   return (

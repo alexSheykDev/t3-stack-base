@@ -14,9 +14,9 @@ import ApartmentForm from "../AppartmentForm";
 
 function CreateApartmentDialog({ onCreated }: { onCreated?: () => void }) {
   const utils = api.useUtils();
-  const createMut = api.appartment.create.useMutation({
+  const createMut = api.apartment.create.useMutation({
     onSuccess: async () => {
-      await utils.appartment.listAll.invalidate();
+      await utils.apartment.listAll.invalidate();
       onCreated?.();
     },
   });

@@ -9,13 +9,13 @@ import EditApartmentDialog from "../EditAppartmentDialog";
 
 export default function AdminApartments() {
   const utils = api.useUtils();
-  const [appartments] = api.appartment.listAll.useSuspenseQuery();
+  const [apartments] = api.apartment.listAll.useSuspenseQuery();
 
-  const publishMut = api.appartment.publish.useMutation({
-    onSuccess: async () => utils.appartment.listAll.invalidate(),
+  const publishMut = api.apartment.publish.useMutation({
+    onSuccess: async () => utils.apartment.listAll.invalidate(),
   });
-  const unpublishMut = api.appartment.unpublish.useMutation({
-    onSuccess: async () => utils.appartment.listAll.invalidate(),
+  const unpublishMut = api.apartment.unpublish.useMutation({
+    onSuccess: async () => utils.apartment.listAll.invalidate(),
   });
 
   return (
@@ -39,13 +39,13 @@ export default function AdminApartments() {
             </tr>
           </thead>
           <tbody>
-            {appartments?.map((appartment) => (
-              <tr key={appartment.id} className="border-t">
+            {apartments?.map((apartment) => (
+              <tr key={apartment.id} className="border-t">
                 <td className="p-3">
-                  {appartment.imageUrl ? (
+                  {apartment.imageUrl ? (
                     <Image
-                      src={appartment.imageUrl}
-                      alt={appartment.title}
+                      src={apartment.imageUrl}
+                      alt={apartment.title}
                       width={64}
                       height={48}
                       className="h-12 w-16 rounded object-cover"
@@ -54,33 +54,33 @@ export default function AdminApartments() {
                     <div className="bg-muted h-12 w-16 rounded" />
                   )}
                 </td>
-                <td className="p-3">{appartment.title}</td>
+                <td className="p-3">{apartment.title}</td>
                 <td className="line-clamp-2 max-w-[420px] p-3">
-                  {appartment.description}
+                  {apartment.description}
                 </td>
-                <td className="p-3">{appartment.price}</td>
-                <td className="p-3">{appartment.maxGuests}</td>
+                <td className="p-3">{apartment.price}</td>
+                <td className="p-3">{apartment.maxGuests}</td>
                 <td className="p-3">
                   <Switch
-                    checked={appartment.isPublished}
+                    checked={apartment.isPublished}
                     onCheckedChange={async (checked) => {
                       if (checked)
-                        await publishMut.mutateAsync({ id: appartment.id });
+                        await publishMut.mutateAsync({ id: apartment.id });
                       else
-                        await unpublishMut.mutateAsync({ id: appartment.id });
+                        await unpublishMut.mutateAsync({ id: apartment.id });
                     }}
                     aria-label={
-                      appartment.isPublished ? "Unpublish" : "Publish"
+                      apartment.isPublished ? "Unpublish" : "Publish"
                     }
                   />
                 </td>
                 <td className="p-3 text-right">
-                  <EditApartmentDialog apartment={appartment} />
+                  <EditApartmentDialog apartment={apartment} />
                 </td>
               </tr>
             ))}
 
-            {appartments?.length === 0 && (
+            {apartments?.length === 0 && (
               <tr>
                 <td
                   colSpan={7}

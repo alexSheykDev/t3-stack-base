@@ -1,5 +1,5 @@
 import * as React from "react";
-import { api, type RouterInputs, type RouterOutputs } from "~/trpc/react";
+import { api, type RouterOutputs } from "~/trpc/react";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -15,14 +15,14 @@ function EditApartmentDialog({
   onUpdated,
   trigger,
 }: {
-  apartment: RouterOutputs["appartment"]["getById"];
+  apartment: RouterOutputs["apartment"]["getById"];
   onUpdated?: () => void;
   trigger?: React.ReactNode;
 }) {
   const utils = api.useUtils();
-  const updateMut = api.appartment.update.useMutation({
+  const updateMut = api.apartment.update.useMutation({
     onSuccess: async () => {
-      await utils.appartment.listAll.invalidate();
+      await utils.apartment.listAll.invalidate();
       onUpdated?.();
     },
   });
