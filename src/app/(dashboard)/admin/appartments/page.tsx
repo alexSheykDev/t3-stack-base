@@ -1,7 +1,17 @@
-export default function SignUpPage() {
+import AdminApartments from "~/_components/modules/appartments/AdminAppartments";
+import { auth } from "~/server/auth";
+import { HydrateClient, api } from "~/trpc/server";
+
+export default async function Page() {
+  const session = await auth();
+
+  if (session?.user) {
+    void api.appartment.listAll.prefetch();
+  }
+
   return (
-    <main className="mx-auto max-w-md p-6">
-      <h1 className="mb-4 text-2xl font-semibold">Appartments Admin User</h1>
-    </main>
+    <HydrateClient>
+      <AdminApartments />
+    </HydrateClient>
   );
 }
