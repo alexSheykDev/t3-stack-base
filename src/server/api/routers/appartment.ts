@@ -31,6 +31,14 @@ export const apartmentRouter = createTRPCRouter({
     });
   }),
 
+  getById: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input }) => {
+      return db.apartment.findUnique({
+        where: { id: input.id },
+      });
+    }),
+
   create: adminProcedure.input(baseApartment).mutation(async ({ input }) => {
     return db.apartment.create({
       data: {

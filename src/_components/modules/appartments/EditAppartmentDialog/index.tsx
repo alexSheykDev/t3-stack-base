@@ -1,5 +1,5 @@
 import * as React from "react";
-import { api } from "~/trpc/react";
+import { api, type RouterInputs, type RouterOutputs } from "~/trpc/react";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -8,32 +8,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import ApartmentForm from "../AppartmentForm";
-
-type ApartmentFormValues = {
-  title: string;
-  description: string;
-  imageUrl?: string;
-  price: string;
-  maxGuests: string;
-};
-
-type ApartmentRow = {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl: string | null;
-  price: number;
-  maxGuests: number;
-  isPublished: boolean;
-};
+import ApartmentForm, { type ApartmentFormValues } from "../AppartmentForm";
 
 function EditApartmentDialog({
   apartment,
   onUpdated,
   trigger,
 }: {
-  apartment: ApartmentRow;
+  apartment: RouterOutputs["appartment"]["getById"];
   onUpdated?: () => void;
   trigger?: React.ReactNode;
 }) {
@@ -46,6 +28,7 @@ function EditApartmentDialog({
   });
 
   const [open, setOpen] = React.useState(false);
+  if (!apartment) return null;
 
   const initial: ApartmentFormValues = {
     title: apartment.title,

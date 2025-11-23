@@ -17,9 +17,7 @@ export default async function Home() {
             Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
           </h1>
           <div className="flex flex-col items-center gap-2">
-            <p className="text-2xl text-white">
-              {"Loading tRPC query..."}
-            </p>
+            <p className="text-2xl text-white">{"Loading tRPC query..."}</p>
 
             <div className="flex flex-col items-center justify-center gap-4">
               <p className="text-center text-2xl text-white">
@@ -41,7 +39,6 @@ export default async function Home() {
               )}
             </div>
           </div>
-
         </div>
       </main>
     </HydrateClient>
