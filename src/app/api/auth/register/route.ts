@@ -3,16 +3,15 @@ import { z } from "zod";
 import bcrypt from "bcrypt";
 import { db } from "~/server/db";
 
-export const RegisterInput = z.object({
+ const registerInputSchema = z.object({
   email: z.string(),
   password: z.string().min(6),
   name: z.string().min(1).optional(),
 });
-export type RegisterInput = z.infer<typeof RegisterInput>;
 
 export async function POST(req: Request) {
   try {
-    const { email, password, name } = RegisterInput.parse(
+    const { email, password, name } = registerInputSchema.parse(
       (await req.json()) as unknown,
     );
 

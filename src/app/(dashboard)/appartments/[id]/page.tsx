@@ -2,18 +2,20 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { api } from "~/trpc/server";
 import { Badge } from "~/components/ui/badge";
-import BookNowButton from "~/_components/modules/appartments/BookNowButton";
+import BookingDialog from "~/_components/modules/appartments/BookingDialog";
 
-type Props = { params: { id: string } };
+type Props = { params: Promise<{ id: string }> };
 
 export async function generateMetadata({ params }: Props) {
-  const apt = await api.apartment.getById({ id: params.id });
+  const {id: aptId} = await params;
+  const apt = await api.apartment.getById({ id: aptId });
   if (!apt) return {};
   return { title: apt.title };
 }
 
 export default async function ApartmentDetails({ params }: Props) {
-  const apt = await api.apartment.getById({ id: params.id });
+  const {id: aptId} = await params;
+  const apt = await api.apartment.getById({ id: aptId });
 
   if (!apt?.isPublished) return notFound();
 
@@ -73,7 +75,7 @@ export default async function ApartmentDetails({ params }: Props) {
             )}
           </div>
 
-          <BookNowButton apartmentId={apt.id} />
+          <BookingDialog apartmentId={apt.id} />
         </div>
       </div>
     </div>
