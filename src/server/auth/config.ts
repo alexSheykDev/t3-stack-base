@@ -48,6 +48,10 @@ export const authConfig = {
     }),
   ],
 
+  pages: {
+    signIn: "/signin",
+  },
+
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -55,6 +59,15 @@ export const authConfig = {
         token.role = user.role ?? "USER";
       }
       return token;
+    },
+
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      try {
+        const u = new URL(url);
+        if (u.origin === baseUrl) return url;
+      } catch {}
+      return `${baseUrl}/appartments`;
     },
 
     async session({ session, token }) {

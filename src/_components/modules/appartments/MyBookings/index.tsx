@@ -52,7 +52,7 @@ export default function MyBookings() {
             <div className="flex-1">
               <Link
                 className="font-medium hover:underline"
-                href={`/apartments/${b.apartment.id}`}
+                href={`/appartments/${b.apartment.id}`}
               >
                 {b.apartment.title}
               </Link>

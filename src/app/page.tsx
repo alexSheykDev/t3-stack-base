@@ -1,46 +1,55 @@
 import Link from "next/link";
-
 import { auth } from "~/server/auth";
-import { api, HydrateClient } from "~/trpc/server";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent } from "~/components/ui/card";
+import { Separator } from "~/components/ui/separator";
+import { redirect } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const session = await auth();
-
-  if (session?.user) {
-  }
+  if (session?.user) redirect("/appartments");
 
   return (
-    <HydrateClient>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-          <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-            Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-          </h1>
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-2xl text-white">{"Loading tRPC query..."}</p>
+    <main className="grid min-h-[80dvh] place-items-center px-4">
+      <div className="w-full max-w-3xl">
+        <Card className="from-background to-muted/30 border-0 bg-gradient-to-br shadow-none">
+          <CardContent className="p-8 md:p-10">
+            <div className="flex flex-col items-center gap-6 text-center">
+              <div className="inline-flex items-center gap-3">
+                <div className="bg-primary/10 size-9 rounded-xl" />
+                <span className="text-muted-foreground text-sm tracking-wide uppercase">
+                  T3 Stack Demo
+                </span>
+              </div>
 
-            <div className="flex flex-col items-center justify-center gap-4">
-              <p className="text-center text-2xl text-white">
-                {session && <span>Logged in as {session.user?.name}</span>}
+              <h1 className="text-3xl leading-tight font-semibold md:text-5xl">
+                Find a place. <span className="text-primary">Book it.</span>
+              </h1>
+
+              <p className="text-muted-foreground max-w-prose text-sm md:text-base">
+                Tiny demo showing a real-world T3 setup: Next.js + tRPC + Prisma
+                + NextAuth + shadcn/ui. Browse published apartments, view
+                details, and book with real availability checks.
               </p>
-              <Link
-                href={session ? "/api/auth/signout" : "/api/auth/signin"}
-                className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
-              >
-                {session ? "Sign out" : "Sign in"}
-              </Link>
-              {!session && (
-                <Link
-                  href="/signup"
-                  className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
-                >
-                  Sign Up
-                </Link>
-              )}
+
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <Button asChild size="lg">
+                  <Link href="/api/auth/signin?callbackUrl=/appartments">
+                    Sign in
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg">
+                  <Link href="/signup?callbackUrl=/appartments">
+                    Create account
+                  </Link>
+                </Button>
+              </div>
             </div>
-          </div>
-        </div>
-      </main>
-    </HydrateClient>
+          </CardContent>
+        </Card>
+      </div>
+    </main>
   );
 }
