@@ -3,7 +3,7 @@ import { z } from "zod";
 import bcrypt from "bcrypt";
 import { db } from "~/server/db";
 
- const registerInputSchema = z.object({
+const registerInputSchema = z.object({
   email: z.string(),
   password: z.string().min(6),
   name: z.string().min(1).optional(),

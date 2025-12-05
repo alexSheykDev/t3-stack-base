@@ -23,7 +23,8 @@ export default function MyBookings() {
     },
   });
 
-  if (isLoading) return <div className="container py-8">Loading your bookings…</div>;
+  if (isLoading)
+    return <div className="container py-8">Loading your bookings…</div>;
 
   const bookings = data ?? [];
 
@@ -32,26 +33,47 @@ export default function MyBookings() {
       <h1 className="mb-6 text-2xl font-semibold">My bookings</h1>
       <div className="space-y-4">
         {bookings.map((b) => (
-          <div key={b.id} className="flex items-center gap-4 rounded-xl border p-4">
+          <div
+            key={b.id}
+            className="flex items-center gap-4 rounded-xl border p-4"
+          >
             {b.apartment.imageUrl ? (
-              <Image src={b.apartment.imageUrl} alt={b.apartment.title} width={96} height={72} className="h-18 w-24 rounded object-cover" />
-            ) : <div className="h-18 w-24 rounded bg-muted" />}
+              <Image
+                src={b.apartment.imageUrl}
+                alt={b.apartment.title}
+                width={96}
+                height={72}
+                className="h-18 w-24 rounded object-cover"
+              />
+            ) : (
+              <div className="bg-muted h-18 w-24 rounded" />
+            )}
 
             <div className="flex-1">
-              <Link className="font-medium hover:underline" href={`/apartments/${b.apartment.id}`}>
+              <Link
+                className="font-medium hover:underline"
+                href={`/apartments/${b.apartment.id}`}
+              >
                 {b.apartment.title}
               </Link>
-              <div className="text-sm text-muted-foreground">
-                {format(new Date(b.startDate), "MMM d, yyyy")} – {format(new Date(b.endDate), "MMM d, yyyy")}
+              <div className="text-muted-foreground text-sm">
+                {format(new Date(b.startDate), "MMM d, yyyy")} –{" "}
+                {format(new Date(b.endDate), "MMM d, yyyy")}
               </div>
             </div>
 
-            <Button variant="outline" onClick={() => cancelMut.mutate({ id: b.id })} disabled={cancelMut.isPending}>
+            <Button
+              variant="outline"
+              onClick={() => cancelMut.mutate({ id: b.id })}
+              disabled={cancelMut.isPending}
+            >
               Cancel
             </Button>
           </div>
         ))}
-        {bookings.length === 0 && <p className="text-muted-foreground">No bookings yet.</p>}
+        {bookings.length === 0 && (
+          <p className="text-muted-foreground">No bookings yet.</p>
+        )}
       </div>
     </div>
   );

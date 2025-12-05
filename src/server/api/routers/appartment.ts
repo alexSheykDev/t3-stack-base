@@ -84,17 +84,19 @@ export const apartmentRouter = createTRPCRouter({
     }),
 
   getAvailability: protectedProcedure
-    .input(z.object({
-      id: z.string().cuid(),
-      from: z.date(),
-      to: z.date(),
-    }))
+    .input(
+      z.object({
+        id: z.string().cuid(),
+        from: z.date(),
+        to: z.date(),
+      }),
+    )
     .query(async ({ input }) => {
       const ranges = await db.booking.findMany({
         where: {
           apartmentId: input.id,
           startDate: { lte: input.to },
-          endDate:   { gte: input.from },
+          endDate: { gte: input.from },
         },
         select: { startDate: true, endDate: true },
         orderBy: { startDate: "asc" },

@@ -29,7 +29,7 @@ export default async function ApartmentsPage() {
                     className="h-40 w-full object-cover"
                   />
                 ) : (
-                  <div className="h-40 w-full bg-muted" />
+                  <div className="bg-muted h-40 w-full" />
                 )}
                 <CardHeader className="space-y-1">
                   <CardTitle className="flex items-center justify-between gap-2">
@@ -38,12 +38,14 @@ export default async function ApartmentsPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  <p className="line-clamp-2 text-sm text-muted-foreground">
+                  <p className="text-muted-foreground line-clamp-2 text-sm">
                     {a.description}
                   </p>
                   <div className="text-sm">
                     <span className="font-medium">${a.price}</span>{" "}
-                    <span className="text-muted-foreground">/ night • max {a.maxGuests} guests</span>
+                    <span className="text-muted-foreground">
+                      / night • max {a.maxGuests} guests
+                    </span>
                   </div>
                 </CardContent>
               </Card>

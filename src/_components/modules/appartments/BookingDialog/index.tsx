@@ -5,10 +5,16 @@ import { type DateRange, DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 
 import { Button } from "~/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog";
 import { api } from "~/trpc/react";
 import { toast } from "sonner";
-import { skipToken } from '@tanstack/react-query';
+import { skipToken } from "@tanstack/react-query";
 
 type Props = { apartmentId: string };
 
@@ -18,12 +24,10 @@ export default function BookingDialog({ apartmentId }: Props) {
 
   const hasRange = !!(range?.from && range?.to);
 
-const { data: availability } = api.booking.isApartmentAvailable.useQuery(
-  hasRange
-    ? { apartmentId, start: range.from!, end: range.to! }
-    : skipToken,
-  { enabled: hasRange }
-);
+  const { data: availability } = api.booking.isApartmentAvailable.useQuery(
+    hasRange ? { apartmentId, start: range.from!, end: range.to! } : skipToken,
+    { enabled: hasRange },
+  );
 
   const createMut = api.booking.createBooking.useMutation({
     onSuccess: async () => {
@@ -59,7 +63,7 @@ const { data: availability } = api.booking.isApartmentAvailable.useQuery(
           />
 
           <div className="flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">
+            <div className="text-muted-foreground text-sm">
               {range?.from && range?.to
                 ? availability?.available
                   ? "Dates available"

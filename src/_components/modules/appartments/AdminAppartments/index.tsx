@@ -66,12 +66,9 @@ export default function AdminApartments() {
                     onCheckedChange={async (checked) => {
                       if (checked)
                         await publishMut.mutateAsync({ id: apartment.id });
-                      else
-                        await unpublishMut.mutateAsync({ id: apartment.id });
+                      else await unpublishMut.mutateAsync({ id: apartment.id });
                     }}
-                    aria-label={
-                      apartment.isPublished ? "Unpublish" : "Publish"
-                    }
+                    aria-label={apartment.isPublished ? "Unpublish" : "Publish"}
                   />
                 </td>
                 <td className="p-3 text-right">

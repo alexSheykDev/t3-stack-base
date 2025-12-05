@@ -29,14 +29,20 @@ export const bookingRouter = createTRPCRouter({
 
   createBooking: protectedProcedure
     .input(
-      dateRange.refine((v) => v.end > v.start, { message: "End must be after start" }),
+      dateRange.refine((v) => v.end > v.start, {
+        message: "End must be after start",
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       const apt = await db.apartment.findFirst({
         where: { id: input.apartmentId, isPublished: true },
         select: { id: true },
       });
-      if (!apt) throw new TRPCError({ code: "NOT_FOUND", message: "Apartment not found" });
+      if (!apt)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Apartment not found",
+        });
 
       const overlap = await db.booking.findFirst({
         where: {
@@ -50,7 +56,10 @@ export const bookingRouter = createTRPCRouter({
         select: { id: true },
       });
       if (overlap) {
-        throw new TRPCError({ code: "CONFLICT", message: "Dates are not available" });
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "Dates are not available",
+        });
       }
 
       const booking = await db.booking.create({
@@ -71,19 +80,18 @@ export const bookingRouter = createTRPCRouter({
       return booking;
     }),
 
-  listMyBookings: protectedProcedure
-    .query(({ ctx }) =>
-      db.booking.findMany({
-        where: { userId: ctx.session.user.id, status: "ACTIVE" },
-        orderBy: { startDate: "desc" },
-        select: {
-          id: true,
-          startDate: true,
-          endDate: true,
-          apartment: { select: { id: true, title: true, imageUrl: true } },
-        },
-      }),
-    ),
+  listMyBookings: protectedProcedure.query(({ ctx }) =>
+    db.booking.findMany({
+      where: { userId: ctx.session.user.id, status: "ACTIVE" },
+      orderBy: { startDate: "desc" },
+      select: {
+        id: true,
+        startDate: true,
+        endDate: true,
+        apartment: { select: { id: true, title: true, imageUrl: true } },
+      },
+    }),
+  ),
 
   cancelBooking: protectedProcedure
     .input(z.object({ id: z.string().cuid() }))
@@ -102,7 +110,8 @@ export const bookingRouter = createTRPCRouter({
   listByApartmentAdmin: protectedProcedure
     .input(z.object({ apartmentId: z.string().cuid() }))
     .query(async ({ ctx, input }) => {
-      if (ctx.session.user.role !== "ADMIN") throw new TRPCError({ code: "FORBIDDEN" });
+      if (ctx.session.user.role !== "ADMIN")
+        throw new TRPCError({ code: "FORBIDDEN" });
       return db.booking.findMany({
         where: { apartmentId: input.apartmentId, status: "ACTIVE" },
         orderBy: { startDate: "asc" },
