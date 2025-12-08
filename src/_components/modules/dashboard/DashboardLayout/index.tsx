@@ -4,13 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import {
-  Menu,
-  Building2,
-  CalendarDays,
-  Settings,
-  ShieldCheck,
-} from "lucide-react";
+import { Menu, Building2, CalendarDays, ShieldCheck } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "~/components/ui/sheet";
 import { Separator } from "~/components/ui/separator";
@@ -45,7 +39,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         adminOnly: true,
         badge: "admin",
       },
-      { href: "/settings", label: "Settings", icon: Settings },
+      /* { href: "/settings", label: "Settings", icon: Settings }, */
     ],
     [],
   );
@@ -54,10 +48,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-dvh">
-      <aside className="bg-background hidden w-64 border-r md:block">
+      <aside className="bg-background hidden w-72 border-r md:block">
         <div className="flex h-16 items-center gap-2 border-b px-4">
           <div className="bg-primary/10 size-8 rounded-lg" />
-          <div className="font-semibold">YourApp</div>
+          <div className="font-semibold">My App</div>
         </div>
         <ScrollArea className="h-[calc(100dvh-4rem)] px-2">
           <nav className="mt-3 space-y-1">
@@ -99,7 +93,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             <SheetContent side="left" className="w-72 p-0">
               <div className="flex h-16 items-center gap-2 border-b px-4">
                 <div className="bg-primary/10 size-8 rounded-lg" />
-                <div className="font-semibold">YourApp</div>
+                <div className="font-semibold">My App</div>
               </div>
               <ScrollArea className="h-[calc(100dvh-4rem)] px-2 py-3">
                 <nav className="space-y-1">

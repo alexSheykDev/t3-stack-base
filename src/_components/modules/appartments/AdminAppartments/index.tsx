@@ -55,9 +55,7 @@ export default function AdminApartments() {
                   )}
                 </td>
                 <td className="p-3">{apartment.title}</td>
-                <td className="line-clamp-2 max-w-[420px] p-3">
-                  {apartment.description}
-                </td>
+                <td className="max-w-[420px] p-3">{apartment.description}</td>
                 <td className="p-3">{apartment.price}</td>
                 <td className="p-3">{apartment.maxGuests}</td>
                 <td className="p-3">

@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import { db } from "~/server/db";
 
@@ -106,21 +110,13 @@ export const bookingRouter = createTRPCRouter({
       });
       return { ok: true };
     }),
-
-  listByApartmentAdmin: protectedProcedure
-    .input(z.object({ apartmentId: z.string().cuid() }))
+  listBookingsByApartment: publicProcedure
+    .input(z.object({ apartmentId: z.string() }))
     .query(async ({ ctx, input }) => {
-      if (ctx.session.user.role !== "ADMIN")
-        throw new TRPCError({ code: "FORBIDDEN" });
-      return db.booking.findMany({
-        where: { apartmentId: input.apartmentId, status: "ACTIVE" },
+      return ctx.db.booking.findMany({
+        where: { apartmentId: input.apartmentId },
+        select: { id: true, startDate: true, endDate: true },
         orderBy: { startDate: "asc" },
-        select: {
-          id: true,
-          startDate: true,
-          endDate: true,
-          user: { select: { id: true, name: true, email: true } },
-        },
       });
     }),
 });
