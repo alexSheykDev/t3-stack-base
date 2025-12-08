@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { Button } from "~/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "~/components/ui/avatar";
@@ -37,7 +36,7 @@ export default function UserMenu() {
           <div className="text-sm font-medium">{name}</div>
           <div className="text-muted-foreground truncate text-xs">{email}</div>
         </div>
-        <DropdownMenuSeparator />
+        {/* <DropdownMenuSeparator /> */}
         {/* <DropdownMenuItem asChild>
           <Link href="/settings">Settings</Link>
         </DropdownMenuItem> */}
