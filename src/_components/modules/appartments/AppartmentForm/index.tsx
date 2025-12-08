@@ -5,6 +5,7 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
+import ImageUploaderBlob from "../ImageUploaderBlob";
 
 export type ApartmentFormValues = {
   title: string;
@@ -81,17 +82,12 @@ function ApartmentForm({
         />
       </div>
 
-      <div>
-        <Label htmlFor="imageUrl">Image URL (optional)</Label>
-        <Input
-          id="imageUrl"
-          value={form.imageUrl ?? ""}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setForm((s) => ({ ...s, imageUrl: e.target.value }))
-          }
-          placeholder="https://…"
-        />
-      </div>
+      <ImageUploaderBlob
+        value={form.imageUrl ?? null}
+        onChange={(url) =>
+          setForm((s) => ({ ...s, imageUrl: url ?? undefined }))
+        }
+      />
 
       <Button onClick={() => onSubmit(form)} disabled={submitting}>
         {submitting ? `${submitLabel}…` : submitLabel}

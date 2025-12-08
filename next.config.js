@@ -5,6 +5,15 @@
 import "./src/env.js";
 
 /** @type {import("next").NextConfig} */
-const config = {};
+const config = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "flad5qtialc9y7jc.public.blob.vercel-storage.com",
+      },
+    ],
+  },
+};
 
 export default config;
