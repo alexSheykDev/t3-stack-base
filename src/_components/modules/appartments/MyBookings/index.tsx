@@ -9,12 +9,7 @@ import { toast } from "sonner";
 
 export default function MyBookings() {
   const utils = api.useUtils();
-
-  const { data, isLoading } = api.booking.listMyBookings.useQuery(undefined, {
-    suspense: false,
-    refetchOnMount: "always",
-    staleTime: 0,
-  });
+  const [data] = api.booking.listMyBookings.useSuspenseQuery();
 
   const cancelMut = api.booking.cancelBooking.useMutation({
     onSuccess: async () => {
@@ -22,9 +17,6 @@ export default function MyBookings() {
       await utils.booking.listMyBookings.invalidate();
     },
   });
-
-  if (isLoading)
-    return <div className="container py-8">Loading your bookings…</div>;
 
   const bookings = data ?? [];
 
