@@ -1,9 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { signIn } from "next-auth/react";
 import { toast } from "sonner";
-import { signUpSchema, type SignUpInput } from "~/validations/auth";
-import { registerAndLogin } from "~/actions/auth/registerAndLoginAction";
 
 import {
   Card,
@@ -16,54 +15,57 @@ import {
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-
-type Errors = Partial<Record<keyof SignUpInput, string>>;
 
 export default function SignUpForm() {
-  const [values, setValues] = React.useState<SignUpInput>({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-  const [errors, setErrors] = React.useState<Errors>({});
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [name, setName] = React.useState("");
   const [submitting, setSubmitting] = React.useState(false);
-  const sp = useSearchParams();
-  const callbackUrl = sp.get("callbackUrl") ?? "/appartments";
+  const [errors, setErrors] = React.useState<{
+    email?: string;
+    password?: string;
+    name?: string;
+  }>({});
 
-  const validate = (v: SignUpInput) => {
-    const parsed = signUpSchema.safeParse(v);
-    if (parsed.success) {
-      setErrors({});
-      return true;
-    }
-    const fieldErrors: Errors = {};
-    for (const i of parsed.error.issues) {
-      const k = i.path[0] as keyof SignUpInput;
-      if (typeof k === "string") fieldErrors[k] ??= i.message;
-    }
-    setErrors(fieldErrors);
-    return false;
+  const validate = () => {
+    const e: typeof errors = {};
+    if (!name.trim()) e.name = "Please enter your name.";
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      e.email = "Enter a valid email.";
+    if (!password || password.length < 6)
+      e.password = "Password must be at least 6 characters.";
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
   const onSubmit = async (ev: React.FormEvent) => {
     ev.preventDefault();
-    if (!validate(values)) return;
+    if (!validate()) return;
+
     try {
       setSubmitting(true);
-
-      const res = await registerAndLogin({
-        ...values,
-        email: values.email.trim().toLowerCase(),
-        name: values.name.trim(),
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+          name: name.trim(),
+        }),
       });
 
-      if (res && !res.ok && res.fieldErrors) {
-        setErrors(res.fieldErrors as Errors);
-        toast.error("Please fix the errors and try again.");
+      if (!res.ok) {
+        toast.error("Registration failed");
+        return;
       }
+
+      toast.success("Account created");
+      await signIn("credentials", {
+        email,
+        password,
+        redirect: true,
+        callbackUrl: "/appartments",
+      });
     } catch {
       toast.error("Unexpected error. Please try again.");
     } finally {
@@ -78,17 +80,14 @@ export default function SignUpForm() {
         <CardDescription>Sign up to start booking apartments.</CardDescription>
       </CardHeader>
 
-      <form onSubmit={onSubmit} noValidate className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-4">
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input
               id="name"
-              value={values.name}
-              onChange={(e) => {
-                const v = e.currentTarget.value;
-                setValues((s) => ({ ...s, name: v }));
-              }}
+              value={name}
+              onChange={(e) => setName(e.currentTarget.value)}
               placeholder="Jane Doe"
               aria-invalid={!!errors.name}
               aria-describedby={errors.name ? "name-error" : undefined}
@@ -105,18 +104,13 @@ export default function SignUpForm() {
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
+              value={email}
+              onChange={(e) => setEmail(e.currentTarget.value)}
               type="email"
-              value={values.email}
-              onChange={(e) => {
-                const v = e.currentTarget.value;
-                setValues((s) => ({ ...s, email: v }));
-              }}
               placeholder="you@example.com"
               aria-invalid={!!errors.email}
               aria-describedby={errors.email ? "email-error" : undefined}
               disabled={submitting}
-              inputMode="email"
-              autoComplete="email"
             />
             {errors.email && (
               <p id="email-error" className="text-destructive text-xs">
@@ -129,17 +123,13 @@ export default function SignUpForm() {
             <Label htmlFor="password">Password</Label>
             <Input
               id="password"
+              value={password}
+              onChange={(e) => setPassword(e.currentTarget.value)}
               type="password"
-              value={values.password}
-              onChange={(e) => {
-                const v = e.currentTarget.value;
-                setValues((s) => ({ ...s, password: v }));
-              }}
               placeholder="••••••••"
               aria-invalid={!!errors.password}
               aria-describedby={errors.password ? "password-error" : undefined}
               disabled={submitting}
-              autoComplete="new-password"
             />
             {errors.password && (
               <p id="password-error" className="text-destructive text-xs">
@@ -147,35 +137,8 @@ export default function SignUpForm() {
               </p>
             )}
             <p className="text-muted-foreground text-xs">
-              At least 6 chars, letters + numbers.
+              Minimum 6 characters.
             </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm password</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              value={values.confirmPassword}
-              onChange={(e) => {
-                const v = e.currentTarget.value;
-                setValues((s) => ({ ...s, confirmPassword: v }));
-              }}
-              aria-invalid={!!errors.confirmPassword}
-              aria-describedby={
-                errors.confirmPassword ? "confirmPassword-error" : undefined
-              }
-              disabled={submitting}
-              autoComplete="new-password"
-            />
-            {errors.confirmPassword && (
-              <p
-                id="confirmPassword-error"
-                className="text-destructive text-xs"
-              >
-                {errors.confirmPassword}
-              </p>
-            )}
           </div>
         </CardContent>
 
@@ -183,16 +146,6 @@ export default function SignUpForm() {
           <Button type="submit" className="w-full" disabled={submitting}>
             {submitting ? "Creating..." : "Create account"}
           </Button>
-
-          <p className="text-muted-foreground text-xs">
-            Already have an account?{" "}
-            <Link
-              href={`/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`}
-              className="hover:text-foreground underline underline-offset-4"
-            >
-              Sign in
-            </Link>
-          </p>
         </CardFooter>
       </form>
     </Card>
