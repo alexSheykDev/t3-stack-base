@@ -24,7 +24,7 @@ export default function BookingDialog({ apartmentId }: Props) {
   const utils = api.useUtils();
   const [range, setRange] = useState<DateRange | undefined>();
   const today = useMemo(() => startOfToday(), []);
-  const router = useRouter()
+  const router = useRouter();
 
   const { data: booked = [] } = api.booking.listBookingsByApartment.useQuery({
     apartmentId,
@@ -58,7 +58,7 @@ export default function BookingDialog({ apartmentId }: Props) {
         utils.booking.listMyBookings.invalidate(),
         utils.booking.listBookingsByApartment.invalidate({ apartmentId }),
       ]);
-      router.push("/bookings/my")
+      router.push("/bookings/my");
     },
     onError: (e) => toast.error(e.message ?? "Failed to book"),
   });

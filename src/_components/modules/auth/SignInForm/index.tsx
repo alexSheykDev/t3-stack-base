@@ -73,7 +73,6 @@ export default function SignInForm() {
           }}
           disabled={loading === "discord"}
         >
-          {/* replace with your icon component if you have one */}
           <span className="mr-2 inline-block">🎮</span>
           {loading === "discord" ? "Connecting…" : "Continue with Discord"}
         </Button>

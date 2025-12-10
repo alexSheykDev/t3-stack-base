@@ -8,5 +8,9 @@ export default async function Page() {
   if (session?.user) {
     void api.booking.listMyBookings.prefetch();
   }
-  return <HydrateClient><MyBookings /></HydrateClient>;
+  return (
+    <HydrateClient>
+      <MyBookings />
+    </HydrateClient>
+  );
 }
