@@ -17,7 +17,6 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 
 type Errors = Partial<Record<keyof SignUpInput, string>>;
 
@@ -30,8 +29,7 @@ export default function SignUpForm() {
   });
   const [errors, setErrors] = React.useState<Errors>({});
   const [submitting, setSubmitting] = React.useState(false);
-  const sp = useSearchParams();
-  const callbackUrl = sp.get("callbackUrl") ?? "/appartments";
+  const callbackUrl = "/appartments";
 
   const validate = (v: SignUpInput) => {
     const parsed = signUpSchema.safeParse(v);
