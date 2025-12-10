@@ -39,7 +39,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         adminOnly: true,
         badge: "admin",
       },
-      /* { href: "/settings", label: "Settings", icon: Settings }, */
     ],
     [],
   );
