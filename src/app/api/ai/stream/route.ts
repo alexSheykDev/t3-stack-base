@@ -1,56 +1,74 @@
-import OpenAI from "openai";
-
-export const runtime = "edge";
+import { ChatOpenAI } from "@langchain/openai";
+import {
+  AIMessage,
+  HumanMessage,
+  SystemMessage,
+} from "@langchain/core/messages";
 
 const apiKey = process.env.OPENAI_API_KEY;
 if (!apiKey) {
   throw new Error("Missing OPENAI_API_KEY");
 }
 
-// OpenAI SDK типізований неідеально, тому ESLint думає, що тут any.
-// Глушимо rule тільки для цієї лінії.
-// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
-const openai = new OpenAI({ apiKey });
-
 type ChatMessage = {
   role: "user" | "assistant" | "system";
   content: string;
 };
 
-type ChatStreamChunk = {
-  choices: {
-    delta?: {
-      content?: string;
-    };
-  }[];
-};
+const model = new ChatOpenAI({
+  modelName: "gpt-4o-mini",
+  temperature: 0.2,
+});
+
+function toLangChainMessages(msgs: ChatMessage[]) {
+  return msgs.map((m) => {
+    if (m.role === "system") return new SystemMessage(m.content);
+    if (m.role === "assistant") return new AIMessage(m.content);
+    return new HumanMessage(m.content);
+  });
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function chunkToText(chunk: any): string {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  const content = chunk?.content;
+  if (!content) return "";
+
+  if (typeof content === "string") return content;
+
+  if (Array.isArray(content)) {
+    return content
+      .map((c) => {
+        if (typeof c === "string") return c;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
+        if ("text" in c && typeof c.text === "string") return c.text;
+        return "";
+      })
+      .join("");
+  }
+
+  return "";
+}
 
 export async function POST(req: Request): Promise<Response> {
   const body = (await req.json()) as { messages: ChatMessage[] };
 
-  // OpenAI для stream повертає значення типу any, тому тут одна локальна поблажка
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  const rawStream = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    stream: true,
-    messages: body.messages,
-  });
+  const lcMessages = toLangChainMessages(body.messages);
 
-  const stream = rawStream as AsyncIterable<ChatStreamChunk>;
+  // LangChain streaming: returns AsyncIterable of AIMessageChunk
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const stream = await model.stream(lcMessages);
 
   const encoder = new TextEncoder();
 
   const readable = new ReadableStream<Uint8Array>({
     async start(controller) {
       try {
-        for await (const chunk of stream) {
-          const firstChoice: ChatStreamChunk["choices"][number] | undefined =
-            chunk.choices[0];
-
-          const delta: string | undefined = firstChoice?.delta?.content;
-
-          if (delta) {
-            controller.enqueue(encoder.encode(delta));
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        for await (const chunk of stream as AsyncIterable<never>) {
+          const text = chunkToText(chunk);
+          if (text) {
+            controller.enqueue(encoder.encode(text));
           }
         }
       } catch (err) {
