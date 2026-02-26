@@ -5,6 +5,7 @@ import { Geist } from "next/font/google";
 
 import { TRPCReactProvider } from "~/trpc/react";
 import { SessionProvider } from "next-auth/react";
+import ChatBubble from "~/_components/modules/ai/ChatBubble";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -24,7 +25,10 @@ export default function RootLayout({
     <html lang="en" className={`${geist.variable}`}>
       <body>
         <TRPCReactProvider>
-          <SessionProvider>{children}</SessionProvider>
+          <SessionProvider>
+            {children}
+            <ChatBubble />
+          </SessionProvider>
         </TRPCReactProvider>
       </body>
     </html>
