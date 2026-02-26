@@ -7,6 +7,8 @@ import { Button } from "~/components/ui/button";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
+// Move invalidate to server part
+
 export default function MyBookings() {
   const utils = api.useUtils();
   const [data] = api.booking.listMyBookings.useSuspenseQuery();
