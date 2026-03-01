@@ -4,7 +4,6 @@ import {
   createTRPCRouter,
   protectedProcedure,
 } from "~/server/api/trpc";
-import { db } from "~/server/db";
 
 const baseApartment = z.object({
   title: z.string().min(2).max(120),
@@ -19,13 +18,13 @@ const baseApartment = z.object({
 });
 
 export const apartmentRouter = createTRPCRouter({
-  listAll: adminProcedure.query(async () => {
-    return db.apartment.findMany({
+  listAll: adminProcedure.query(async ({ ctx }) => {
+    return ctx.db.apartment.findMany({
       orderBy: { createdAt: "desc" },
     });
   }),
-  listPublished: protectedProcedure.query(async () => {
-    return db.apartment.findMany({
+  listPublished: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.apartment.findMany({
       where: { isPublished: true },
       orderBy: { createdAt: "desc" },
     });
@@ -33,14 +32,14 @@ export const apartmentRouter = createTRPCRouter({
 
   getById: protectedProcedure
     .input(z.object({ id: z.string() }))
-    .query(async ({ input }) => {
-      return db.apartment.findUnique({
+    .query(async ({ ctx, input }) => {
+      return ctx.db.apartment.findUnique({
         where: { id: input.id },
       });
     }),
 
-  create: adminProcedure.input(baseApartment).mutation(async ({ input }) => {
-    return db.apartment.create({
+  create: adminProcedure.input(baseApartment).mutation(async ({ ctx, input }) => {
+    return ctx.db.apartment.create({
       data: {
         title: input.title,
         description: input.description,
@@ -58,8 +57,8 @@ export const apartmentRouter = createTRPCRouter({
         data: baseApartment.partial(),
       }),
     )
-    .mutation(async ({ input }) => {
-      return db.apartment.update({
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.apartment.update({
         where: { id: input.id },
         data: input.data,
       });
@@ -67,8 +66,8 @@ export const apartmentRouter = createTRPCRouter({
 
   publish: adminProcedure
     .input(z.object({ id: z.string().cuid() }))
-    .mutation(async ({ input }) => {
-      return db.apartment.update({
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.apartment.update({
         where: { id: input.id },
         data: { isPublished: true },
       });
@@ -76,8 +75,8 @@ export const apartmentRouter = createTRPCRouter({
 
   unpublish: adminProcedure
     .input(z.object({ id: z.string().cuid() }))
-    .mutation(async ({ input }) => {
-      return db.apartment.update({
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.apartment.update({
         where: { id: input.id },
         data: { isPublished: false },
       });
@@ -91,8 +90,8 @@ export const apartmentRouter = createTRPCRouter({
         to: z.date(),
       }),
     )
-    .query(async ({ input }) => {
-      const ranges = await db.booking.findMany({
+    .query(async ({ ctx, input }) => {
+      const ranges = await ctx.db.booking.findMany({
         where: {
           apartmentId: input.id,
           startDate: { lte: input.to },

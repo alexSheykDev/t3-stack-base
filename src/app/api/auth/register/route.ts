@@ -15,16 +15,13 @@ export async function POST(req: Request) {
       (await req.json()) as unknown,
     );
 
-    const exists = await db.user.findUnique({ where: { email } });
-    if (exists) {
-      return NextResponse.json(
-        { error: "Email already in use" },
-        { status: 409 },
-      );
-    }
-
     const passwordHash = await bcrypt.hash(password, 12);
 
+    const exists = await db.user.findUnique({ where: { email } });
+      if (exists) {
+        throw new Error("EMAIL_EXISTS");
+      }
+    
     await db.user.create({
       data: { email, name, role: "USER", passwordHash },
     });
@@ -33,6 +30,12 @@ export async function POST(req: Request) {
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: err.flatten() }, { status: 400 });
+    }
+    if (err instanceof Error && err.message === "EMAIL_EXISTS") {
+      return NextResponse.json(
+        { error: "Email already in use" },
+        { status: 409 },
+      );
     }
     return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
   }
